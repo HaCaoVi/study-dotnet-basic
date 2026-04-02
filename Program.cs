@@ -1,69 +1,79 @@
 using System.Text.Json;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using project_basic.Database;
 using project_basic.Filters;
 using project_basic.Middleware;
+using project_basic.Repositories;
+using project_basic.Repositories.Interfaces;
+using project_basic.Services;
+using project_basic.Services.Interfaces;
 using project_basic.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DbContext")));
+// Database
+builder.Services.AddDbContext<ApplicationDbContext>(options => 
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DbContext")));
 
+// Dependency Injection
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// Validation
+// Disable default ASP.NET Core model state validation so our filter takes over
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
 
-builder.Services.AddScoped<ValidationFilter>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserValidator>();
 
+// Controllers with global ValidationFilter
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidationFilter>();
-});
-
-builder.Services.AddControllers();
-
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<CreateUserValidator>();
-
-builder.Services.ConfigureHttpJsonOptions(options =>
+})
+.AddJsonOptions(options =>
 {
-    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
 });
 
 var app = builder.Build();
 
+// Auto-migration or DB check (optional, but keep it if user had it)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    Console.WriteLine(db.Database.GetConnectionString());
     try
     {
-        db.Database.CanConnect();
-        Console.WriteLine("✅ Connected to Postgres successfully");
+        if (db.Database.CanConnect())
+        {
+            Console.WriteLine("✅ Connected to Postgres successfully");
+        }
     }
     catch (Exception ex)
     {
-        Console.WriteLine("❌ Cannot connect to Postgres");
-        Console.WriteLine(ex.Message);
+        Console.WriteLine("❌ Cannot connect to Postgres: " + ex.Message);
     }
 }
 
-// Configure the HTTP request pipeline.
+// HTTP request pipeline order is important
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();  
+    app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
+// Global Exception Middleware (before MapControllers)
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
