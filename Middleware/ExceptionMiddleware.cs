@@ -1,7 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
 using project_basic.Common;
 using project_basic.Common.Exceptions;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace project_basic.Middleware;
 
@@ -34,6 +36,15 @@ public class ExceptionMiddleware
         
         switch (ex)
         {
+            case ValidationException validationEx:
+                statusCode = 400;
+                message = "Validation Error";
+                errors = validationEx.Errors.Select(e => new
+                {
+                    field = e.PropertyName,
+                    error = e.ErrorMessage
+                });
+                break;
             case NotFoundException:
                 statusCode = 404;
                 message = ex.Message;
@@ -62,8 +73,6 @@ public class ExceptionMiddleware
 
         context.Response.StatusCode = statusCode;
 
-        var json = JsonSerializer.Serialize(response);
-
-        await context.Response.WriteAsync(json);
+        await context.Response.WriteAsJsonAsync(response);
     }
 }
