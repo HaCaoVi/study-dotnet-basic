@@ -22,14 +22,14 @@ public class UserService : IUserService
         _passwordHasher = passwordHasher;
     }
 
-    public async Task<PagedResult<UserDto>> GetAllUsersAsync(QueryUserDto queryUserDto)
+    public async Task<PagedResult<UserDto>> GetAllUsersAsync(QueryUserDto queryUserDto, CancellationToken ct)
     {
         var queryable = _userRepository.GetQueryable();
         var totalCount = await queryable.CountAsync();
         var users = await queryable
             .Skip((queryUserDto.PageNumber - 1) * queryUserDto.PageSize)
             .Take(queryUserDto.PageSize)
-            .ToListAsync();
+            .ToListAsync(ct);
         var result = users.Select(u => _mapper.Map<UserDto>(u)).ToList();
         return new PagedResult<UserDto>
         {
@@ -43,9 +43,9 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<UserDto> GetUserByIdAsync(Guid id)
+    public async Task<UserDto> GetUserByIdAsync(Guid id, CancellationToken ct)
     {
-        var user = await _userRepository.GetByIdAsync(id);
+        var user = await _userRepository.GetByIdAsync(id, ct);
         if (user == null)
         {
             throw new NotFoundException($"User with ID {id} was not found.");
@@ -53,9 +53,9 @@ public class UserService : IUserService
         return _mapper.Map<UserDto>(user);
     }
 
-    public async Task<UserDto> CreateUserAsync(CreateUserDto createUserDto)
+    public async Task<UserDto> CreateUserAsync(CreateUserDto createUserDto, CancellationToken ct)
     {
-        var existingUser = await _userRepository.GetByEmailAsync(createUserDto.Email);
+        var existingUser = await _userRepository.GetByEmailAsync(createUserDto.Email, ct);
         if (existingUser != null)
         {
             throw new ConflictException($"User with email {createUserDto.Email} already exists.");
@@ -69,15 +69,15 @@ public class UserService : IUserService
             Address = createUserDto.Address
         };
         user.Password = _passwordHasher.HashPassword(user, createUserDto.Password);
-        await _userRepository.AddAsync(user);
-        await _userRepository.SaveChangesAsync();
+        await _userRepository.AddAsync(user, ct);
+        await _userRepository.SaveChangesAsync(ct);
 
         return _mapper.Map<UserDto>(user);
     }
 
-    public async Task UpdateUserAsync(Guid id, UpdateUserDto updateUserDto)
+    public async Task UpdateUserAsync(Guid id, UpdateUserDto updateUserDto, CancellationToken ct)
     {
-        var user = await _userRepository.GetByIdAsync(id);
+        var user = await _userRepository.GetByIdAsync(id, ct);
         if (user == null)
         {
             throw new NotFoundException($"User with ID {id} was not found.");
@@ -89,18 +89,18 @@ public class UserService : IUserService
         user.Address = updateUserDto.Address;
 
         await _userRepository.UpdateAsync(user);
-        await _userRepository.SaveChangesAsync();
+        await _userRepository.SaveChangesAsync(ct);
     }
 
-    public async Task DeleteUserAsync(Guid id)
+    public async Task DeleteUserAsync(Guid id, CancellationToken ct)
     {
-        var user = await _userRepository.GetByIdAsync(id);
+        var user = await _userRepository.GetByIdAsync(id, ct);
         if (user == null)
         {
             throw new NotFoundException($"User with ID {id} was not found.");
         }
 
         await _userRepository.DeleteAsync(user);
-        await _userRepository.SaveChangesAsync();
+        await _userRepository.SaveChangesAsync(ct);
     }
 }

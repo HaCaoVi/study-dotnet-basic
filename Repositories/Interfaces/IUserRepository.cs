@@ -5,11 +5,11 @@ namespace project_basic.Repositories.Interfaces;
 public interface IUserRepository
 {
     IQueryable<User> GetQueryable();
-    Task<User?> GetByIdAsync(Guid id);
-    Task<User?> GetByEmailAsync(string email);
-    Task AddAsync(User user);
+    Task<User?> GetByIdAsync(Guid id, CancellationToken ct);
+    Task<User?> GetByEmailAsync(string email, CancellationToken ct);
+    Task AddAsync(User user, CancellationToken ct);
     Task UpdateAsync(User user);
     Task DeleteAsync(User user);
-    Task<bool> ExistsAsync(Guid id);
-    Task<bool> SaveChangesAsync();
+    Task<bool> ExistsAsync(Guid id, CancellationToken ct);
+    Task<bool> SaveChangesAsync(CancellationToken ct);
 }

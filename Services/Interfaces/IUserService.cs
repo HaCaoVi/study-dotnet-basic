@@ -6,9 +6,9 @@ namespace project_basic.Services.Interfaces;
 
 public interface IUserService
 {
-    Task<PagedResult<UserDto>> GetAllUsersAsync(QueryUserDto  queryUserDto);
-    Task<UserDto> GetUserByIdAsync(Guid id);
-    Task<UserDto> CreateUserAsync(CreateUserDto createUserDto);
-    Task UpdateUserAsync(Guid id, UpdateUserDto updateUserDto);
-    Task DeleteUserAsync(Guid id);
+    Task<PagedResult<UserDto>> GetAllUsersAsync(QueryUserDto  queryUserDto, CancellationToken ct);
+    Task<UserDto> GetUserByIdAsync(Guid id, CancellationToken ct);
+    Task<UserDto> CreateUserAsync(CreateUserDto createUserDto, CancellationToken ct);
+    Task UpdateUserAsync(Guid id, UpdateUserDto updateUserDto, CancellationToken ct);
+    Task DeleteUserAsync(Guid id, CancellationToken ct);
 }
