@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using project_basic.Common;
+using project_basic.Common.Responses;
 using project_basic.Dtos.UserDtos;
 using project_basic.Models;
 using project_basic.Services.Interfaces;
@@ -18,28 +19,28 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IEnumerable<User>>>> GetUsers()
+    public async Task<ActionResult<ApiResponse<PagedResult<UserDto>>>> GetUsers([FromQuery] QueryUserDto queryUserDto)
     {
-        var users = await _userService.GetAllUsersAsync();
-        return Ok(ApiResponse<IEnumerable<User>>.Success(users, "Users retrieved successfully."));
+        var users = await _userService.GetAllUsersAsync(queryUserDto);
+        return Ok(ApiResponse<PagedResult<UserDto>>.Success(users, "Users retrieved successfully."));
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ApiResponse<User>>> GetUser(Guid id)
+    public async Task<ActionResult<ApiResponse<UserDto>>> GetUser(Guid id)
     {
         var user = await _userService.GetUserByIdAsync(id);
-        return Ok(ApiResponse<User>.Success(user, "User retrieved successfully."));
+        return Ok(ApiResponse<UserDto>.Success(user, "User retrieved successfully."));
     }
 
     [HttpPost]
-    public async Task<ActionResult<ApiResponse<User>>> CreateUser([FromBody] CreateUserDto createUserDto)
+    public async Task<ActionResult<ApiResponse<UserDto>>> CreateUser([FromBody] CreateUserDto createUserDto)
     {
         var user = await _userService.CreateUserAsync(createUserDto);
-        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, ApiResponse<User>.Success(user, "User created successfully."));
+        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, ApiResponse<UserDto>.Success(user, "User created successfully.",201));
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<ApiResponse<object>>> UpdateUser(Guid id, [FromBody] CreateUserDto updateUserDto)
+    public async Task<ActionResult<ApiResponse<object>>> UpdateUser(Guid id, [FromBody] UpdateUserDto updateUserDto)
     {
         await _userService.UpdateUserAsync(id, updateUserDto);
         return Ok(ApiResponse<object>.Success(null, "User updated successfully."));

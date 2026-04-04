@@ -14,11 +14,6 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<User>> GetAllAsync()
-    {
-        return await _context.Users.ToListAsync();
-    }
-
     public async Task<User?> GetByIdAsync(Guid id)
     {
         return await _context.Users.FindAsync(id);
@@ -54,5 +49,10 @@ public class UserRepository : IUserRepository
     public async Task<bool> SaveChangesAsync()
     {
         return (await _context.SaveChangesAsync()) > 0;
+    }
+    
+    public IQueryable<User> GetQueryable()
+    {
+        return _context.Users.AsNoTracking();
     }
 }

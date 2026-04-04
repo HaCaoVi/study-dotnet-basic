@@ -1,10 +1,13 @@
 using System.Text.Json;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using project_basic.Database;
 using project_basic.Filters;
+using project_basic.Mappings;
 using project_basic.Middleware;
+using project_basic.Models;
 using project_basic.Repositories;
 using project_basic.Repositories.Interfaces;
 using project_basic.Services;
@@ -22,6 +25,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DbContext")));
 
 // Dependency Injection
+// Register password hasher
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+// Register your services
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
@@ -33,6 +40,8 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateUserValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<QueryUserValidator>();
 
 // Controllers with global ValidationFilter
 builder.Services.AddControllers(options =>
@@ -44,6 +53,9 @@ builder.Services.AddControllers(options =>
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
 });
+
+// Auto mapper
+builder.Services.AddAutoMapper(typeof(UserMapping));
 
 var app = builder.Build();
 
