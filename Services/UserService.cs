@@ -25,7 +25,7 @@ public class UserService : IUserService
     public async Task<PagedResult<UserDto>> GetAllUsersAsync(QueryUserDto queryUserDto, CancellationToken ct)
     {
         var queryable = _userRepository.GetQueryable();
-        var totalCount = await queryable.CountAsync();
+        var totalCount = await queryable.CountAsync(ct);
         var users = await queryable
             .Skip((queryUserDto.PageNumber - 1) * queryUserDto.PageSize)
             .Take(queryUserDto.PageSize)

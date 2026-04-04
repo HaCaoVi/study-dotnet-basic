@@ -41,11 +41,6 @@ public class UserRepository : IUserRepository
         await Task.CompletedTask;
     }
 
-    public async Task<bool> ExistsAsync(Guid id, CancellationToken ct)
-    {
-        return await _context.Users.AnyAsync(u => u.Id == id, ct);
-    }
-
     public async Task<bool> SaveChangesAsync(CancellationToken ct)
     {
         return (await _context.SaveChangesAsync(ct)) > 0;

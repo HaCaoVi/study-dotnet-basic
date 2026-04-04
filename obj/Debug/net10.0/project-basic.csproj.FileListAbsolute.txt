@@ -129,3 +129,11 @@
 /home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/FluentValidation.DependencyInjectionExtensions.dll
 /home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/AutoMapper.dll
 /home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+/home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/Microsoft.IdentityModel.Abstractions.dll
+/home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/Microsoft.IdentityModel.Logging.dll
+/home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.dll
+/home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+/home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/Microsoft.IdentityModel.Tokens.dll
+/home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/System.IdentityModel.Tokens.Jwt.dll
