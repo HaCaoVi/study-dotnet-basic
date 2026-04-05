@@ -1,6 +1,7 @@
 using System.Text.Json;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +40,9 @@ builder.Services.AddOpenApi(options =>
         {
             Type = SecuritySchemeType.Http,
             Scheme = "bearer",
-            BearerFormat = "JWT"
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Name = "Authorization"
         };
 
         // 2. Apply security
@@ -57,6 +60,14 @@ builder.Services.AddOpenApi(options =>
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("DbContext")));
+
+// Config Authorization All Route (FallbackPolicy)
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 // Dependency Injection
 // Register password hasher
@@ -90,6 +101,7 @@ builder.Services.AddControllers(options =>
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
 });
+
 
 // Auto mapper
 builder.Services.AddAutoMapper(typeof(UserMapping));
@@ -184,11 +196,14 @@ using (var scope = app.Services.CreateScope())
 // HTTP request pipeline order is important
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapOpenApi().AllowAnonymous();
+    app.MapScalarApiReference().AllowAnonymous();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // Global Exception Middleware (before MapControllers)
 app.UseMiddleware<ExceptionMiddleware>();

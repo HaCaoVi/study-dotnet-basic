@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using project_basic.Common;
 using project_basic.Dtos.AuthDtos;
@@ -16,6 +17,7 @@ public class AuthController: ControllerBase
         _authService = authService;
     }
     
+    [AllowAnonymous]
     [HttpPost]
     public async Task<ActionResult<ApiResponse<AuthDto>>> Login(LoginDto loginDto, CancellationToken ct)
     {
