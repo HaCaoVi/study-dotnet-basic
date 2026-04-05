@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using project_basic.Database;
@@ -11,9 +12,11 @@ using project_basic.Database;
 namespace project_basic.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260405115107_InitRoleAndPermission")]
+    partial class InitRoleAndPermission
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,7 +71,7 @@ namespace project_basic.Migrations
                     b.HasIndex("Path", "Method")
                         .IsUnique();
 
-                    b.ToTable("Permission", (string)null);
+                    b.ToTable("Permission");
                 });
 
             modelBuilder.Entity("project_basic.Models.Role", b =>
@@ -105,7 +108,7 @@ namespace project_basic.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Role", (string)null);
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("project_basic.Models.RolePermission", b =>
@@ -140,7 +143,7 @@ namespace project_basic.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RolePermission", (string)null);
+                    b.ToTable("RolePermission");
                 });
 
             modelBuilder.Entity("project_basic.Models.User", b =>
@@ -208,7 +211,7 @@ namespace project_basic.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("project_basic.Models.RolePermission", b =>

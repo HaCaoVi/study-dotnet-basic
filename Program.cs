@@ -176,7 +176,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Config 
+// Config Context Accessor
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();

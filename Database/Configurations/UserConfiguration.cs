@@ -9,6 +9,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasKey(u => u.Id);
+        builder.HasOne(u => u.Role)
+            .WithMany(r => r.Users)
+            .HasForeignKey(u => u.RoleId)
+            .OnDelete(DeleteBehavior.Restrict);
         
         builder.Property(u => u.Email).IsRequired().HasMaxLength(256);
         builder.HasIndex(u => u.Email).IsUnique();
@@ -18,5 +22,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Address)
             .HasMaxLength(255)
             .HasDefaultValue(string.Empty);
+        
+        
     }
 }

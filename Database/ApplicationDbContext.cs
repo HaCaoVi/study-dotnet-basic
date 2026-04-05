@@ -44,9 +44,19 @@ public class ApplicationDbContext: DbContext
                 entry.Entity.UpdatedAt = now;
                 entry.Entity.UpdatedBy = userId;
 
-                // ❗ tránh bị overwrite CreatedAt
                 entry.Property(x => x.CreatedAt).IsModified = false;
                 entry.Property(x => x.CreatedBy).IsModified = false;
+            }
+            else if (entry.State == EntityState.Deleted)
+            {
+                // 👉 convert delete thành soft delete
+                entry.State = EntityState.Modified;
+
+                entry.Entity.DeletedAt = now;
+                entry.Entity.DeletedBy = userId;
+
+                entry.Entity.UpdatedAt = now;
+                entry.Entity.UpdatedBy = userId;
             }
         }
 

@@ -12,6 +12,6 @@ public class User: BaseEntity
     public EGenderType? Gender { get; set; }
     public string Address { get; set; } = string.Empty;
     public string RefreshToken { get; set; } = string.Empty;
-    // public Guid Company { get; set; }
-    // public Guid Role { get; set; }
+    public Guid RoleId { get; set; }    
+    public Role Role { get; set; }
 }
