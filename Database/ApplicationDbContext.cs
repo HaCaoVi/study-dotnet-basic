@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using project_basic.Interfaces;
 using project_basic.Models;
 
 namespace project_basic.Database;
@@ -22,40 +23,61 @@ public class ApplicationDbContext: DbContext
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var entries = ChangeTracker.Entries<BaseEntity>();
-
         var now = DateTime.UtcNow;
 
-        var userId = _httpContextAccessor?.HttpContext?.User?
+        var userIdStr = _httpContextAccessor?.HttpContext?.User?
             .FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        foreach (var entry in entries)
+        Guid? userId = null;
+        if (Guid.TryParse(userIdStr, out var parsed))
         {
-            if (entry.State == EntityState.Added)
-            {
-                entry.Entity.CreatedAt = now;
-                entry.Entity.UpdatedAt = now;
+            userId = parsed;
+        }
 
-                entry.Entity.CreatedBy = userId;
-                entry.Entity.UpdatedBy = userId;
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            var state = entry.State;
+
+            // ===== AUDIT (BaseEntity) =====
+            if (entry.Entity is BaseEntity baseEntity)
+            {
+                if (state == EntityState.Added)
+                {
+                    baseEntity.CreatedAt = now;
+                    baseEntity.UpdatedAt = now;
+                    baseEntity.CreatedBy = userId;
+                    baseEntity.UpdatedBy = userId;
+                }
+                else if (state == EntityState.Modified)
+                {
+                    baseEntity.UpdatedAt = now;
+                    baseEntity.UpdatedBy = userId;
+
+                    // ❗ không cho sửa Created
+                    entry.Property(nameof(BaseEntity.CreatedAt)).IsModified = false;
+                    entry.Property(nameof(BaseEntity.CreatedBy)).IsModified = false;
+                }
             }
-            else if (entry.State == EntityState.Modified)
+
+            // ===== SOFT DELETE =====
+            if (entry.Entity is ISoftDelete softDelete)
             {
-                entry.Entity.UpdatedAt = now;
-                entry.Entity.UpdatedBy = userId;
+                if (state == EntityState.Deleted)
+                {
+                    // 👉 convert sang update
+                    entry.State = EntityState.Modified;
 
-                entry.Property(x => x.CreatedAt).IsModified = false;
-                entry.Property(x => x.CreatedBy).IsModified = false;
-            }
-            else if (entry.State == EntityState.Deleted)
-            {
-                entry.State = EntityState.Modified;
+                    softDelete.IsDeleted = true;
+                    softDelete.DeletedAt = now;
+                    softDelete.DeletedBy = userId;
 
-                entry.Entity.DeletedAt = now;
-                entry.Entity.DeletedBy = userId;
-
-                entry.Entity.UpdatedAt = now;
-                entry.Entity.UpdatedBy = userId;
+                    // 👉 update audit nếu có
+                    if (entry.Entity is BaseEntity b)
+                    {
+                        b.UpdatedAt = now;
+                        b.UpdatedBy = userId;
+                    }
+                }
             }
         }
 

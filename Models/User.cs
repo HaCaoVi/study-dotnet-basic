@@ -1,8 +1,9 @@
+using project_basic.Interfaces;
 using project_basic.Types;
 
 namespace project_basic.Models;
 
-public class User: BaseEntity
+public class User: BaseEntity, ISoftDelete
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Email { get; set; } = null!;
@@ -13,6 +14,8 @@ public class User: BaseEntity
     public string Address { get; set; } = string.Empty;
     public string RefreshToken { get; set; } = string.Empty;
     public bool IsDeleted { get; set; } = false;
-    public Guid? RoleId { get; set; }    
-    public Role? Role { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public Guid? DeletedBy { get; set; }
+    public Guid RoleId { get; set; }    
+    public Role Role { get; set; }
 }
