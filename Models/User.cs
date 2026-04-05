@@ -12,6 +12,7 @@ public class User: BaseEntity
     public EGenderType? Gender { get; set; }
     public string Address { get; set; } = string.Empty;
     public string RefreshToken { get; set; } = string.Empty;
-    public Guid RoleId { get; set; }    
-    public Role Role { get; set; }
+    public bool IsDeleted { get; set; } = false;
+    public Guid? RoleId { get; set; }    
+    public Role? Role { get; set; }
 }

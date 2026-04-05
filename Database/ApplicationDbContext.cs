@@ -49,7 +49,6 @@ public class ApplicationDbContext: DbContext
             }
             else if (entry.State == EntityState.Deleted)
             {
-                // 👉 convert delete thành soft delete
                 entry.State = EntityState.Modified;
 
                 entry.Entity.DeletedAt = now;

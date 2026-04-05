@@ -101,7 +101,6 @@ public class UserService : IUserService
         {
             throw new NotFoundException($"User with ID {id} was not found.");
         }
-
         await _userRepository.DeleteAsync(user);
         await _genericRepository.SaveChangesAsync(ct);
     }
