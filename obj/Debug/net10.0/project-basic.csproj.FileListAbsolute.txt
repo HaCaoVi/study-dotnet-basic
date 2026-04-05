@@ -137,3 +137,4 @@
 /home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/Microsoft.IdentityModel.Tokens.dll
 /home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/System.IdentityModel.Tokens.Jwt.dll
+/home/icao/Personal/Project/BE/project-basic/project-basic/bin/Debug/net10.0/Scalar.AspNetCore.dll

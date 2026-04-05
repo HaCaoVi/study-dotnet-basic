@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using project_basic.Common;
 using project_basic.Common.Responses;
@@ -17,7 +18,8 @@ public class UserController : ControllerBase
     {
         _userService = userService;
     }
-
+    
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<ApiResponse<PagedResult<UserDto>>>> GetUsers([FromQuery] QueryUserDto queryUserDto,CancellationToken ct)
     {

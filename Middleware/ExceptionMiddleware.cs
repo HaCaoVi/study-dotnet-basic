@@ -34,10 +34,9 @@ public class ExceptionMiddleware
     {
         context.Response.ContentType = "application/json";
 
-        int statusCode = (int)HttpStatusCode.InternalServerError;
-        string message = "An unexpected error occurred.";
+        var statusCode = (int)HttpStatusCode.InternalServerError;
+        var message = "An unexpected error occurred.";
         object? errors = null;
-
         switch (ex)
         {
             case BaseException baseEx:
@@ -55,7 +54,6 @@ public class ExceptionMiddleware
                     error = e.ErrorMessage
                 });
                 break;
-
             default:
                 // Log the actual internal error
                 _logger.LogError(ex, "Unhandled Exception: {Message}", ex.Message);

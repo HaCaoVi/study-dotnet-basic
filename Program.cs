@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using project_basic.Database;
 using project_basic.Filters;
 using project_basic.Mappings;
@@ -16,12 +17,42 @@ using project_basic.Services;
 using project_basic.Services.Interfaces;
 using project_basic.Validators;
 using project_basic.Validators.AuthValidator;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Config Scalar
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        // 1. Components
+        document.Components ??= new OpenApiComponents();
+
+        document.Components.SecuritySchemes ??=
+            new Dictionary<string, IOpenApiSecurityScheme>();
+
+        document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
+        {
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT"
+        };
+
+        // 2. Apply security
+        document.Security ??= new List<OpenApiSecurityRequirement>();
+
+        document.Security.Add(new OpenApiSecurityRequirement
+        {
+            [new OpenApiSecuritySchemeReference("Bearer")] = new List<string>()
+        });
+
+        return Task.CompletedTask;
+    });
+});
 
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options => 
@@ -91,6 +122,44 @@ builder.Services.AddAuthentication(options =>
         RequireExpirationTime = true,
         ClockSkew = TimeSpan.Zero
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine("JWT ERROR: " + context.Exception.Message);
+            return Task.CompletedTask;
+        },
+        OnChallenge = async context =>
+        {
+            // Ngăn default response
+            context.HandleResponse();
+
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.ContentType = "application/json";
+
+            var result = new
+            {
+                statusCode = 401,
+                message = "Unauthorized - Token invalid or missing"
+            };
+
+            await context.Response.WriteAsJsonAsync(result);
+        },
+
+        OnForbidden = async context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.ContentType = "application/json";
+
+            var result = new
+            {
+                statusCode = 403,
+                message = "Forbidden"
+            };
+
+            await context.Response.WriteAsJsonAsync(result);
+        }
+    };
 });
 
 var app = builder.Build();
@@ -115,18 +184,18 @@ using (var scope = app.Services.CreateScope())
 // HTTP request pipeline order is important
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
 
+// Global Exception Middleware (before MapControllers)
+app.UseMiddleware<ExceptionMiddleware>();
+
 // Config Auth
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Global Exception Middleware (before MapControllers)
-app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
 
