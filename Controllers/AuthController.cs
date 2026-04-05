@@ -18,7 +18,7 @@ public class AuthController: ControllerBase
     }
     
     [AllowAnonymous]
-    [HttpPost]
+    [HttpPost("login")]
     public async Task<ActionResult<ApiResponse<AuthDto>>> Login(LoginDto loginDto, CancellationToken ct)
     {
         var result = await _authService.LoginAsync(loginDto, ct);

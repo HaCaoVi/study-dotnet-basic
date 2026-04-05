@@ -179,6 +179,19 @@ builder.Services.AddAuthentication(options =>
 // Config Context Accessor
 builder.Services.AddHttpContextAccessor();
 
+// Config CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Auto-migration or DB check (optional, but keep it if user had it)
@@ -212,6 +225,8 @@ if (!app.Environment.IsDevelopment())
 
 // Global Exception Middleware (before MapControllers)
 app.UseMiddleware<ExceptionMiddleware>();
+
+app.UseCors("AllowAll");
 
 // Config Auth
 app.UseAuthentication();
