@@ -25,7 +25,5 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Address)
             .HasMaxLength(255)
             .HasDefaultValue(string.Empty);
-        
-        
     }
 }
