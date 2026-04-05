@@ -14,10 +14,12 @@ public class UserService : IUserService
 {
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IUserRepository _userRepository;
+    private readonly IGenericRepository _genericRepository;
     private readonly IMapper _mapper;
-    public UserService(IUserRepository userRepository, IMapper mapper,  IPasswordHasher<User> passwordHasher)
+    public UserService(IUserRepository userRepository, IGenericRepository genericRepository, IMapper mapper,  IPasswordHasher<User> passwordHasher)
     {
         _userRepository = userRepository;
+        _genericRepository = genericRepository;
         _mapper = mapper;
         _passwordHasher = passwordHasher;
     }
@@ -70,7 +72,7 @@ public class UserService : IUserService
         };
         user.Password = _passwordHasher.HashPassword(user, createUserDto.Password);
         await _userRepository.AddAsync(user, ct);
-        await _userRepository.SaveChangesAsync(ct);
+        await _genericRepository.SaveChangesAsync(ct);
 
         return _mapper.Map<UserDto>(user);
     }
@@ -89,7 +91,7 @@ public class UserService : IUserService
         user.Address = updateUserDto.Address;
 
         await _userRepository.UpdateAsync(user);
-        await _userRepository.SaveChangesAsync(ct);
+        await _genericRepository.SaveChangesAsync(ct);
     }
 
     public async Task DeleteUserAsync(Guid id, CancellationToken ct)
@@ -101,6 +103,6 @@ public class UserService : IUserService
         }
 
         await _userRepository.DeleteAsync(user);
-        await _userRepository.SaveChangesAsync(ct);
+        await _genericRepository.SaveChangesAsync(ct);
     }
 }

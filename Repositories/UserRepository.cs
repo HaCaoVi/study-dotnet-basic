@@ -41,11 +41,6 @@ public class UserRepository : IUserRepository
         await Task.CompletedTask;
     }
 
-    public async Task<bool> SaveChangesAsync(CancellationToken ct)
-    {
-        return (await _context.SaveChangesAsync(ct)) > 0;
-    }
-    
     public IQueryable<User> GetQueryable()
     {
         return _context.Users.AsNoTracking();

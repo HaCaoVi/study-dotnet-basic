@@ -73,8 +73,10 @@ builder.Services.AddAuthorization(options =>
 // Register password hasher
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
-// Register your services
+// Register Service and Repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IGenericRepository, GenericRepository>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -173,6 +175,9 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
+
+// Config 
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

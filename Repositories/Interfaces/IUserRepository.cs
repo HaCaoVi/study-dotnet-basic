@@ -10,5 +10,4 @@ public interface IUserRepository
     Task AddAsync(User user, CancellationToken ct);
     Task UpdateAsync(User user);
     Task DeleteAsync(User user);
-    Task<bool> SaveChangesAsync(CancellationToken ct);
 }

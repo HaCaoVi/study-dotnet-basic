@@ -11,12 +11,14 @@ namespace project_basic.Services;
 public class AuthService: IAuthService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IGenericRepository _genericRepository;
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly ITokenService _tokenService;
     
-    public AuthService(IUserRepository userRepository, IPasswordHasher<User> passwordHasher,  ITokenService tokenService)
+    public AuthService(IUserRepository userRepository, IGenericRepository genericRepository, IPasswordHasher<User> passwordHasher,  ITokenService tokenService)
     {
         _userRepository = userRepository;
+        _genericRepository = genericRepository;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
     }
@@ -42,7 +44,7 @@ public class AuthService: IAuthService
         
         
         checkUser.RefreshToken = _tokenService.HashToken(refreshToken);
-        await _userRepository.SaveChangesAsync(ct);
+        await _genericRepository.SaveChangesAsync(ct);
         return new AuthDto
         {
             AccessToken = accessToken,
