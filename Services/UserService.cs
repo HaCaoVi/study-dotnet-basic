@@ -31,6 +31,7 @@ public class UserService : IUserService
         var queryable = _userRepository.GetQueryable();
         var totalCount = await queryable.CountAsync(ct);
         var users = await queryable
+            .Include(u => u.Role)
             .Skip((queryUserDto.PageNumber - 1) * queryUserDto.PageSize)
             .Take(queryUserDto.PageSize)
             .ToListAsync(ct);

@@ -114,8 +114,7 @@ builder.Services.AddControllers(options =>
 
 
 // Auto mapper
-builder.Services.AddAutoMapper(typeof(UserMapping));
-builder.Services.AddAutoMapper(typeof(CompanyMapping));
+builder.Services.AddAutoMapper(typeof(EntityMapping));
 
 // Config JWT
 builder.Services.AddAuthentication(options =>
