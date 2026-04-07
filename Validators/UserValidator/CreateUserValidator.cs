@@ -1,12 +1,11 @@
 using FluentValidation;
 using project_basic.Dtos.UserDtos;
-using project_basic.Repositories.Interfaces;
 
 namespace project_basic.Validators;
 
 public class CreateUserValidator: AbstractValidator<CreateUserDto>
 {
-    public CreateUserValidator(IRoleRepository roleRepository)
+    public CreateUserValidator()
     {
         RuleFor(u=> u.Email)
             .NotEmpty().WithMessage("Email is required")

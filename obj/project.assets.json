@@ -3155,11 +3155,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/icao/Personal/Project/BE/project-basic/project-basic/project-basic.csproj",
+      "projectUniqueName": "/home/icao/Personal/study-dotnet-basic/project-basic.csproj",
       "projectName": "project-basic",
-      "projectPath": "/home/icao/Personal/Project/BE/project-basic/project-basic/project-basic.csproj",
+      "projectPath": "/home/icao/Personal/study-dotnet-basic/project-basic.csproj",
       "packagesPath": "/home/icao/.nuget/packages/",
-      "outputPath": "/home/icao/Personal/Project/BE/project-basic/project-basic/obj/",
+      "outputPath": "/home/icao/Personal/study-dotnet-basic/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/icao/.nuget/NuGet/NuGet.Config"

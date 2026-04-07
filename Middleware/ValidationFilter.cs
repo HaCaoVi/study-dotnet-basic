@@ -19,6 +19,8 @@ public class ValidationFilter : IAsyncActionFilter
         // 🔥 1. Check model binding error trước
         if (!context.ModelState.IsValid)
         {
+            var bodyParamName = context.ActionDescriptor.Parameters.FirstOrDefault()?.Name;
+
             var failures = context.ModelState
                 .Where(x => x.Value.Errors.Count > 0)
                 .SelectMany(x => x.Value.Errors.Select(e =>
@@ -29,8 +31,9 @@ public class ValidationFilter : IAsyncActionFilter
                     if (field.StartsWith("$."))
                         field = field.Substring(2);
 
-                    if (field == "createUserDto")
-                        return null; // bỏ root object
+                    // ❌ chỉ bỏ đúng root param
+                    if (field == bodyParamName)
+                        return null;
 
                     var message = e.ErrorMessage;
 
