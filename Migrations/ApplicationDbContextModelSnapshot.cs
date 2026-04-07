@@ -67,7 +67,7 @@ namespace project_basic.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Company");
+                    b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("project_basic.Models.Permission", b =>
@@ -141,7 +141,7 @@ namespace project_basic.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Role");
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("project_basic.Models.RolePermission", b =>
@@ -170,7 +170,7 @@ namespace project_basic.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RolePermission");
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("project_basic.Models.User", b =>

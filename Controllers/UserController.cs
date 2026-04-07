@@ -19,21 +19,20 @@ public class UserController : ControllerBase
         _userService = userService;
     }
     
-    [Authorize]
     [HttpGet]
     public async Task<ActionResult<ApiResponse<PagedResult<UserDto>>>> GetUsers([FromQuery] QueryUserDto queryUserDto,CancellationToken ct)
     {
         var users = await _userService.GetAllUsersAsync(queryUserDto, ct);
         return Ok(ApiResponse<PagedResult<UserDto>>.Success(users, "Users retrieved successfully."));
     }
-
     [HttpGet("{id}")]
     public async Task<ActionResult<ApiResponse<UserDto>>> GetUser(Guid id, CancellationToken ct)
     {
         var user = await _userService.GetUserByIdAsync(id, ct);
         return Ok(ApiResponse<UserDto>.Success(user, "User retrieved successfully."));
     }
-
+    
+    [AllowAnonymous]
     [HttpPost]
     public async Task<ActionResult<ApiResponse<UserDto>>> CreateUser([FromBody] CreateUserDto createUserDto, CancellationToken ct)
     {

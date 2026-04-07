@@ -1,11 +1,12 @@
 using FluentValidation;
 using project_basic.Dtos.UserDtos;
+using project_basic.Repositories.Interfaces;
 
 namespace project_basic.Validators;
 
-public class CreateUserValidator : AbstractValidator<CreateUserDto>
+public class CreateUserValidator: AbstractValidator<CreateUserDto>
 {
-    public CreateUserValidator()
+    public CreateUserValidator(IRoleRepository roleRepository)
     {
         RuleFor(u=> u.Email)
             .NotEmpty().WithMessage("Email is required")
@@ -26,5 +27,8 @@ public class CreateUserValidator : AbstractValidator<CreateUserDto>
             .MaximumLength(255)
             .When(u => !string.IsNullOrEmpty(u.Address))
             .WithMessage("Address max length is 255");
+
+        RuleFor(u => u.RoleId)
+            .NotEmpty().WithMessage("RoleId is required");
     }
 }

@@ -18,6 +18,7 @@ using project_basic.Services;
 using project_basic.Services.Interfaces;
 using project_basic.Validators;
 using project_basic.Validators.AuthValidator;
+using project_basic.Validators.CompanyValidator;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -76,10 +77,13 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 // Register Service and Repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IGenericRepository, GenericRepository>();
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
 
 // Validation
 // Disable default ASP.NET Core model state validation so our filter takes over
@@ -91,6 +95,10 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateUserValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<QueryUserValidator>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateCompanyValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateCompanyValidator>();
+
 builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
 
 // Controllers with global ValidationFilter
@@ -107,6 +115,7 @@ builder.Services.AddControllers(options =>
 
 // Auto mapper
 builder.Services.AddAutoMapper(typeof(UserMapping));
+builder.Services.AddAutoMapper(typeof(CompanyMapping));
 
 // Config JWT
 builder.Services.AddAuthentication(options =>

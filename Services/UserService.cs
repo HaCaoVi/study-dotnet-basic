@@ -15,11 +15,13 @@ public class UserService : IUserService
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IUserRepository _userRepository;
     private readonly IGenericRepository _genericRepository;
+    private readonly IRoleRepository _roleRepository;
     private readonly IMapper _mapper;
-    public UserService(IUserRepository userRepository, IGenericRepository genericRepository, IMapper mapper,  IPasswordHasher<User> passwordHasher)
+    public UserService(IUserRepository userRepository, IGenericRepository genericRepository, IMapper mapper,  IPasswordHasher<User> passwordHasher, IRoleRepository roleRepository)
     {
         _userRepository = userRepository;
         _genericRepository = genericRepository;
+        _roleRepository = roleRepository;
         _mapper = mapper;
         _passwordHasher = passwordHasher;
     }
@@ -57,6 +59,8 @@ public class UserService : IUserService
 
     public async Task<UserDto> CreateUserAsync(CreateUserDto createUserDto, CancellationToken ct)
     {
+        var existingRole = await _roleRepository.ExistRoleId(createUserDto.RoleId, ct);
+        if (!existingRole) throw new NotFoundException($"Role with ID {createUserDto.RoleId} was not found.");
         var existingUser = await _userRepository.GetByEmailAsync(createUserDto.Email, ct);
         if (existingUser != null)
         {
@@ -68,7 +72,8 @@ public class UserService : IUserService
             Email = createUserDto.Email,
             Name = createUserDto.Name,
             Age = createUserDto.Age,
-            Address = createUserDto.Address
+            Address = createUserDto.Address,
+            RoleId = createUserDto.RoleId
         };
         user.Password = _passwordHasher.HashPassword(user, createUserDto.Password);
         await _userRepository.AddAsync(user, ct);
