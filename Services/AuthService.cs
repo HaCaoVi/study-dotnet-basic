@@ -95,4 +95,13 @@ public class AuthService: IAuthService
             Name = user.Name
         };
     }
+
+    public async Task LogoutAsync(CancellationToken ct)
+    {
+        var userId = _httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var user = await _userRepository.GetByIdAsync(Guid.Parse(userId!), ct);
+        if (user == null) throw new NotFoundException("Account not found");
+        user.RefreshToken = string.Empty;
+        await _genericRepository.SaveChangesAsync(ct);
+    }
 }

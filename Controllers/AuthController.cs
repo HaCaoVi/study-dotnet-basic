@@ -55,4 +55,12 @@ public class AuthController: ControllerBase
         });
         return Ok(ApiResponse<AuthDto>.Success(result, "Refresh successfully"));
     }
+
+    [HttpPost("logout")]
+    public async Task<ActionResult> Logout(CancellationToken ct)
+    {
+        await _authService.LogoutAsync(ct);
+        Response.Cookies.Delete("refreshToken");
+        return NoContent();
+    }
 }
