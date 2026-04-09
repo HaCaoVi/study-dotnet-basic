@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using project_basic.Dtos.UserDtos;
 using project_basic.Models;
 
@@ -7,4 +8,5 @@ public interface ITokenService
 {
     string GenerateToken(User user,  int expiresIn);
     string HashToken(string token);
+    ClaimsPrincipal ValidateRefreshToken(string token);
 }

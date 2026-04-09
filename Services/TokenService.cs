@@ -29,11 +29,13 @@ public class TokenService : ITokenService
     {
         var id = user.Id;
         var name = user.Name;
+        var role = user.RoleId;
 
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, id.ToString()),
             new(ClaimTypes.Name, name),
+            new(ClaimTypes.Role, role.ToString()),
         };
         var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256Signature);
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -47,5 +49,27 @@ public class TokenService : ITokenService
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
+    }
+    
+    public ClaimsPrincipal ValidateRefreshToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = _key,
+
+            ValidateIssuer = true,
+            ValidateAudience = true,
+
+            ValidIssuer = _config["JWT:Issuer"],
+            ValidAudience = _config["JWT:Audience"],
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        }, out _);
+
+        return principal;
     }
 }
