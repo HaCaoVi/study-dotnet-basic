@@ -75,13 +75,19 @@ public class AuthService: IAuthService
         }
 
         var principal = _tokenService.ValidateRefreshToken(refreshToken);
-        var userId = principal.FindFirst(ClaimTypes.NameIdentifier).Value;
+        
+        var userId = principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userId))
+            throw new BadRequestException("Invalid token");
+        
         var user = await _userRepository.GetByIdAsync(Guid.Parse(userId), ct);
         if (user == null || user.RefreshToken != _tokenService.HashToken(refreshToken)) throw new BadRequestException("Token invalid");
         
         var accessToken = _tokenService.GenerateToken(user, 30);
         var newRefreshToken = _tokenService.GenerateToken(user, 30 * 24 * 60);
-
+        user.RefreshToken = _tokenService.HashToken(newRefreshToken);
+        await _genericRepository.SaveChangesAsync(ct);
         return new AuthDto
         {
             AccessToken = accessToken,

@@ -1,5 +1,6 @@
 using System.Net;
 using FluentValidation;
+using Microsoft.IdentityModel.Tokens;
 using project_basic.Common;
 using project_basic.Common.Exceptions;
 
@@ -54,6 +55,21 @@ public class ExceptionMiddleware
                     error = e.ErrorMessage
                 });
                 break;
+            case SecurityTokenExpiredException:
+                statusCode = (int)HttpStatusCode.Unauthorized;
+                message = "Token expired";
+                break;
+
+            case SecurityTokenInvalidSignatureException:
+                statusCode = (int)HttpStatusCode.Unauthorized;
+                message = "Invalid token signature";
+                break;
+
+            case SecurityTokenException:
+                statusCode = (int)HttpStatusCode.Unauthorized;
+                message = "Invalid token";
+                break;
+
             default:
                 // Log the actual internal error
                 _logger.LogError(ex, "Unhandled Exception: {Message}", ex.Message);
