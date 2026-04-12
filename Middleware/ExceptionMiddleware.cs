@@ -24,6 +24,36 @@ public class ExceptionMiddleware
         try
         {
             await _next(context);
+
+            if (!context.Response.HasStarted)
+            {
+                if (context.Response.StatusCode == StatusCodes.Status401Unauthorized)
+                {
+                    context.Response.ContentType = "application/json";
+
+                    var response = new ApiResponse<object>(
+                        data: null,
+                        message: "Unauthorized",
+                        statusCode: 401,
+                        errors: null
+                    );
+
+                    await context.Response.WriteAsJsonAsync(response);
+                }
+                else if (context.Response.StatusCode == StatusCodes.Status403Forbidden)
+                {
+                    context.Response.ContentType = "application/json";
+
+                    var response = new ApiResponse<object>(
+                        data: null,
+                        message: "Forbidden",
+                        statusCode: 403,
+                        errors: null
+                    );
+
+                    await context.Response.WriteAsJsonAsync(response);
+                }
+            }
         }
         catch (Exception e)
         {

@@ -48,8 +48,6 @@ public class AuthService: IAuthService
         var accessToken = _tokenService.GenerateToken(checkUser, 30);
         var refreshToken = _tokenService.GenerateToken(checkUser, 30 * 24 * 60);
         
-        
-        
         checkUser.RefreshToken = _tokenService.HashToken(refreshToken);
         await _genericRepository.SaveChangesAsync(ct);
         return new AuthDto

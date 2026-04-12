@@ -1,9 +1,9 @@
 using System.Text.Json;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -62,13 +62,7 @@ builder.Services.AddOpenApi(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("DbContext")));
 
-// Config Authorization All Route (FallbackPolicy)
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-});
+// Config Authorization: Mọi API đều yêu cầu Authenticate mặc định (FallbackPolicy)
 
 // Dependency Injection
 // Register password hasher
@@ -104,6 +98,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
 // Controllers with global ValidationFilter
 builder.Services.AddControllers(options =>
 {
+    options.Filters.Add(new AuthorizeFilter());
     options.Filters.Add<ValidationFilter>();
 })
 .AddJsonOptions(options =>
@@ -151,35 +146,22 @@ builder.Services.AddAuthentication(options =>
             Console.WriteLine("JWT ERROR: " + context.Exception.Message);
             return Task.CompletedTask;
         },
-        OnChallenge = async context =>
+        OnMessageReceived = context =>
         {
-            // Ngăn default response
-            context.HandleResponse();
+            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
 
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            context.Response.ContentType = "application/json";
-
-            var result = new
+            if (string.IsNullOrEmpty(authHeader))
             {
-                statusCode = 401,
-                message = "Unauthorized - Token invalid or missing"
-            };
+                context.NoResult(); // 👈 chỉ để không crash
+                return Task.CompletedTask;
+            }
 
-            await context.Response.WriteAsJsonAsync(result);
-        },
-
-        OnForbidden = async context =>
-        {
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            context.Response.ContentType = "application/json";
-
-            var result = new
+            if (authHeader.StartsWith("Bearer "))
             {
-                statusCode = 403,
-                message = "Forbidden"
-            };
+                context.Token = authHeader.Substring("Bearer ".Length);
+            }
 
-            await context.Response.WriteAsJsonAsync(result);
+            return Task.CompletedTask;
         }
     };
 });
