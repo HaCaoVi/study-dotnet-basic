@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using project_basic.Common.Exceptions;
 using project_basic.Common.Responses;
 using project_basic.Dtos.UserDtos;
-using project_basic.Models;
+using project_basic.Entities;
 using project_basic.Repositories.Interfaces;
 using project_basic.Services.Interfaces;
 
@@ -14,13 +14,19 @@ public class UserService : IUserService
 {
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IUserRepository _userRepository;
-    private readonly IGenericRepository _genericRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IRoleRepository _roleRepository;
     private readonly IMapper _mapper;
-    public UserService(IUserRepository userRepository, IGenericRepository genericRepository, IMapper mapper,  IPasswordHasher<User> passwordHasher, IRoleRepository roleRepository)
+
+    public UserService(
+        IUserRepository userRepository,
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        IPasswordHasher<User> passwordHasher,
+        IRoleRepository roleRepository)
     {
         _userRepository = userRepository;
-        _genericRepository = genericRepository;
+        _unitOfWork = unitOfWork;
         _roleRepository = roleRepository;
         _mapper = mapper;
         _passwordHasher = passwordHasher;
@@ -62,12 +68,13 @@ public class UserService : IUserService
     {
         var existingRole = await _roleRepository.ExistRoleId(createUserDto.RoleId, ct);
         if (!existingRole) throw new NotFoundException($"Role with ID {createUserDto.RoleId} was not found.");
+
         var existingUser = await _userRepository.GetByEmailAsync(createUserDto.Email, ct);
         if (existingUser != null)
         {
             throw new ConflictException($"User with email {createUserDto.Email} already exists.");
         }
-        
+
         var user = new User
         {
             Email = createUserDto.Email,
@@ -78,7 +85,7 @@ public class UserService : IUserService
         };
         user.Password = _passwordHasher.HashPassword(user, createUserDto.Password);
         await _userRepository.AddAsync(user, ct);
-        await _genericRepository.SaveChangesAsync(ct);
+        await _unitOfWork.SaveChangesAsync(ct);
 
         return _mapper.Map<UserDto>(user);
     }
@@ -96,8 +103,8 @@ public class UserService : IUserService
         user.Age = updateUserDto.Age;
         user.Address = updateUserDto.Address;
 
-        await _userRepository.UpdateAsync(user);
-        await _genericRepository.SaveChangesAsync(ct);
+        _userRepository.Update(user);
+        await _unitOfWork.SaveChangesAsync(ct);
     }
 
     public async Task DeleteUserAsync(Guid id, CancellationToken ct)
@@ -107,7 +114,7 @@ public class UserService : IUserService
         {
             throw new NotFoundException($"User with ID {id} was not found.");
         }
-        await _userRepository.DeleteAsync(user);
-        await _genericRepository.SaveChangesAsync(ct);
+        _userRepository.Delete(user);
+        await _unitOfWork.SaveChangesAsync(ct);
     }
 }

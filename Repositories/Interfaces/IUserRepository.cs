@@ -1,4 +1,4 @@
-using project_basic.Models;
+using project_basic.Entities;
 
 namespace project_basic.Repositories.Interfaces;
 
@@ -8,6 +8,6 @@ public interface IUserRepository
     Task<User?> GetByIdAsync(Guid id, CancellationToken ct);
     Task<User?> GetByEmailAsync(string email, CancellationToken ct);
     Task AddAsync(User user, CancellationToken ct);
-    Task UpdateAsync(User user);
-    Task DeleteAsync(User user);
+    void Update(User user);
+    void Delete(User user);
 }

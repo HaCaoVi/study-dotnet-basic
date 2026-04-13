@@ -1,6 +1,5 @@
 using project_basic.Common.Responses;
 using project_basic.Dtos.CompanyDto;
-using project_basic.Models;
 
 namespace project_basic.Services.Interfaces;
 

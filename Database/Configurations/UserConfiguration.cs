@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using project_basic.Models;
+using project_basic.Entities;
 
 namespace project_basic.Database.Configurations;
 

@@ -1,6 +1,5 @@
 using FluentValidation;
 using project_basic.Dtos.AuthDtos;
-using project_basic.Repositories.Interfaces;
 
 namespace project_basic.Validators.AuthValidator;
 

@@ -1,6 +1,5 @@
 using System.Security.Claims;
-using project_basic.Dtos.UserDtos;
-using project_basic.Models;
+using project_basic.Entities;
 
 namespace project_basic.Services.Interfaces;
 

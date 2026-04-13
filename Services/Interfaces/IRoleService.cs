@@ -1,6 +1,5 @@
 namespace project_basic.Services.Interfaces;
 
-public class IRoleService
+public interface IRoleService
 {
-    
 }

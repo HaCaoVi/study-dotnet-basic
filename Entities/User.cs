@@ -1,7 +1,7 @@
 using project_basic.Interfaces;
 using project_basic.Types;
 
-namespace project_basic.Models;
+namespace project_basic.Entities;
 
 public class User: BaseEntity, ISoftDelete
 {

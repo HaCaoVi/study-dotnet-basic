@@ -14,15 +14,14 @@ public enum EGenderType
     Other = 3
 }
 
-
 public enum EMethod
 {
     [Description("GET")]
-    Unknown = 0,
+    Get = 0,
     [Description("POST")]
-    Male = 1,
+    Post = 1,
     [Description("PUT")]
-    Female = 2,
+    Put = 2,
     [Description("DELETE")]
-    Other = 3
+    Delete = 3
 }

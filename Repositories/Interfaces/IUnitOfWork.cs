@@ -1,6 +1,6 @@
 namespace project_basic.Repositories.Interfaces;
 
-public interface IGenericRepository
+public interface IUnitOfWork
 {
     Task<bool> SaveChangesAsync(CancellationToken ct);
 }

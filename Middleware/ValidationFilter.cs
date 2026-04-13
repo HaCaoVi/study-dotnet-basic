@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using project_basic.Common.Exceptions;
 using ValidationException = FluentValidation.ValidationException;
 
-namespace project_basic.Filters;
+namespace project_basic.Middleware;
 
 public class ValidationFilter : IAsyncActionFilter
 {
@@ -22,8 +22,8 @@ public class ValidationFilter : IAsyncActionFilter
             var bodyParamName = context.ActionDescriptor.Parameters.FirstOrDefault()?.Name;
 
             var failures = context.ModelState
-                .Where(x => x.Value.Errors.Count > 0)
-                .SelectMany(x => x.Value.Errors.Select(e =>
+                .Where(x => x.Value?.Errors.Count > 0)
+                .SelectMany(x => x.Value!.Errors.Select(e =>
                 {
                     var field = x.Key;
 

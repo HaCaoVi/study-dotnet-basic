@@ -191,9 +191,6 @@
 /home/icao/Personal/study-dotnet-basic/bin/Debug/net10.0/Npgsql.dll
 /home/icao/Personal/study-dotnet-basic/bin/Debug/net10.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
 /home/icao/Personal/study-dotnet-basic/bin/Debug/net10.0/Scalar.AspNetCore.dll
-/home/icao/Personal/study-dotnet-basic/bin/Debug/net10.0/Swashbuckle.AspNetCore.Swagger.dll
-/home/icao/Personal/study-dotnet-basic/bin/Debug/net10.0/Swashbuckle.AspNetCore.SwaggerGen.dll
-/home/icao/Personal/study-dotnet-basic/bin/Debug/net10.0/Swashbuckle.AspNetCore.SwaggerUI.dll
 /home/icao/Personal/study-dotnet-basic/bin/Debug/net10.0/System.CodeDom.dll
 /home/icao/Personal/study-dotnet-basic/bin/Debug/net10.0/System.Composition.AttributedModel.dll
 /home/icao/Personal/study-dotnet-basic/bin/Debug/net10.0/System.Composition.Convention.dll
@@ -278,3 +275,4 @@
 /home/icao/Personal/study-dotnet-basic/obj/Debug/net10.0/project-.0A180453.Up2Date
 /home/icao/Personal/study-dotnet-basic/obj/Debug/net10.0/project-basic.genruntimeconfig.cache
 /home/icao/Personal/study-dotnet-basic/obj/Debug/net10.0/ref/project-basic.dll
+/home/icao/Personal/study-dotnet-basic/bin/Debug/net10.0/appsettings.Production.json

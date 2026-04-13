@@ -63,17 +63,21 @@ public class ExceptionMiddleware
 
     private async Task HandleException(HttpContext context, Exception ex)
     {
+        var correlationId = context.Items["CorrelationId"]?.ToString();
+
         context.Response.ContentType = "application/json";
 
         var statusCode = (int)HttpStatusCode.InternalServerError;
         var message = "An unexpected error occurred.";
         object? errors = null;
+
         switch (ex)
         {
             case BaseException baseEx:
                 statusCode = baseEx.StatusCode;
                 message = baseEx.Message;
                 errors = baseEx.Errors;
+                _logger.LogWarning(ex, "Business exception [{CorrelationId}]: {Message}", correlationId, message);
                 break;
 
             case ValidationException validationEx:
@@ -84,27 +88,31 @@ public class ExceptionMiddleware
                     field = e.PropertyName,
                     error = e.ErrorMessage
                 });
+                _logger.LogWarning("Validation failed [{CorrelationId}]: {@Errors}", correlationId, errors);
                 break;
+
             case SecurityTokenExpiredException:
                 statusCode = (int)HttpStatusCode.Unauthorized;
                 message = "Token expired";
+                _logger.LogWarning("Token expired [{CorrelationId}]", correlationId);
                 break;
 
             case SecurityTokenInvalidSignatureException:
                 statusCode = (int)HttpStatusCode.Unauthorized;
                 message = "Invalid token signature";
+                _logger.LogWarning("Invalid token signature [{CorrelationId}]", correlationId);
                 break;
 
             case SecurityTokenException:
                 statusCode = (int)HttpStatusCode.Unauthorized;
                 message = "Invalid token";
+                _logger.LogWarning("Invalid token [{CorrelationId}]", correlationId);
                 break;
 
             default:
-                // Log the actual internal error
-                _logger.LogError(ex, "Unhandled Exception: {Message}", ex.Message);
-                
-                // In production, we don't return the full exception message
+                _logger.LogError(ex, "Unhandled Exception [{CorrelationId}]: {Message}", correlationId, ex.Message);
+
+                // In production, don't return the full exception details
                 if (_env.IsDevelopment())
                 {
                     message = ex.Message;

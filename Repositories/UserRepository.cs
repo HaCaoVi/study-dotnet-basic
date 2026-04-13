@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using project_basic.Database;
-using project_basic.Models;
+using project_basic.Entities;
 using project_basic.Repositories.Interfaces;
 
 namespace project_basic.Repositories;
@@ -31,16 +31,14 @@ public class UserRepository : IUserRepository
         await _context.Users.AddAsync(user, ct);
     }
 
-    public async Task UpdateAsync(User user)
+    public void Update(User user)
     {
         _context.Users.Update(user);
-        await Task.CompletedTask;
     }
 
-    public async Task DeleteAsync(User user)
+    public void Delete(User user)
     {
         _context.Users.Remove(user);
-        await Task.CompletedTask;
     }
 
     public IQueryable<User> GetQueryable()

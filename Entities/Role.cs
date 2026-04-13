@@ -1,4 +1,4 @@
-namespace project_basic.Models;
+namespace project_basic.Entities;
 
 public class Role: BaseEntity
 {

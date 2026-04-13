@@ -1,6 +1,6 @@
 using project_basic.Interfaces;
 
-namespace project_basic.Models;
+namespace project_basic.Entities;
 
 public class Company: BaseEntity, ISoftDelete
 {

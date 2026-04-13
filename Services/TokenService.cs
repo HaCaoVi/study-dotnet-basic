@@ -2,55 +2,55 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using project_basic.Models;
+using project_basic.Common.Configuration;
+using project_basic.Entities;
 using project_basic.Services.Interfaces;
 
 namespace project_basic.Services;
 
 public class TokenService : ITokenService
 {
-    private readonly IConfiguration _config;
+    private readonly JwtSettings _jwtSettings;
     private readonly SymmetricSecurityKey _key;
-    
-    public TokenService(IConfiguration config)
+
+    public TokenService(IOptions<JwtSettings> jwtSettings)
     {
-        _config = config;
-        _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:SigningKey"]));
+        _jwtSettings = jwtSettings.Value;
+        _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SigningKey));
     }
-    
+
     public string HashToken(string token)
     {
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));
         return Convert.ToBase64String(bytes);
     }
-    
+
     public string GenerateToken(User user, int expiresIn)
     {
-        var id = user.Id;
-        var name = user.Name;
-        var role = user.RoleId;
-
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, id.ToString()),
-            new(ClaimTypes.Name, name),
-            new(ClaimTypes.Role, role.ToString()),
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.Name),
+            new(ClaimTypes.Role, user.RoleId.ToString()),
         };
+
         var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256Signature);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddMinutes(expiresIn),
             SigningCredentials = creds,
-            Issuer = _config["JWT:Issuer"],
-            Audience = _config["JWT:Audience"],
+            Issuer = _jwtSettings.Issuer,
+            Audience = _jwtSettings.Audience,
         };
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
-    
+
     public ClaimsPrincipal ValidateRefreshToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -59,13 +59,10 @@ public class TokenService : ITokenService
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = _key,
-
             ValidateIssuer = true,
             ValidateAudience = true,
-
-            ValidIssuer = _config["JWT:Issuer"],
-            ValidAudience = _config["JWT:Audience"],
-
+            ValidIssuer = _jwtSettings.Issuer,
+            ValidAudience = _jwtSettings.Audience,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
         }, out _);
